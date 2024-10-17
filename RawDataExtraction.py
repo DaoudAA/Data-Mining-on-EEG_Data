@@ -1,46 +1,49 @@
 import os
 import pandas as pd
+import numpy as np
 
 
-# Function to read electrode data for a patient and convert it to a DataFrame
-def read_eeg_data(patient_folder, condition):
+def read_eeg_data_flattened(patient_folder, condition, max_timestamps=1024):
     all_data = []
+    electrode_names = []
 
-    # Loop through all electrode files for the patient
-    for file in os.listdir(patient_folder):
+    for file in sorted(os.listdir(patient_folder)):
         if file.endswith('.txt'):
             electrode_name = file.split('.')[0]
+            electrode_names.append(electrode_name)
             file_path = os.path.join(patient_folder, file)
 
-            # Read the entire EEG data from the file as a list of timestamp values
-            with open(file_path, 'r') as f:
-                data = f.read().splitlines()  # All records as a single list of strings
-
-            # Skip if the file is empty
-            if not data:
+            # Check if the file is empty
+            if os.path.getsize(file_path) == 0:
                 print(f"Skipping empty file: {file_path}")
                 continue
 
-            # Convert all data into floats (or handle any conversion issues as needed)
             try:
+                with open(file_path, 'r') as f:
+                    data = f.read().splitlines()
+
+                # Convert data to floats
                 data = [float(value) for value in data]
+
+                # Pad data with NaNs if needed
+                padded_data = data + [np.nan] * (max_timestamps - len(data))
+                all_data.append(padded_data[:max_timestamps])
             except ValueError:
                 print(f"Skipping file due to invalid data: {file_path}")
                 continue
 
-            # Append the data in the desired format: [Electrode, Timestamp values..., Condition]
-            row = [electrode_name] + data + [condition]
-            all_data.append(row)
+    # Flatten the list of data
+    flattened_data = [item for sublist in all_data for item in sublist]
+    flattened_data.append(condition)
 
-    return all_data  # List of rows
+    return flattened_data, electrode_names
 
 
-# Traverse the directory structure and aggregate data
-def aggregate_patient_data(root_dir):
+def aggregate_patient_data_flattened(root_dir, max_timestamps=1024):
     aggregated_data = []
-    max_timestamps = 0  # Track the maximum number of timestamps
+    column_names_set = False
+    column_names = []
 
-    # Loop through AD and Healthy folders
     for condition in ['AD', 'Healthy']:
         condition_folder = os.path.join(root_dir, condition)
 
@@ -51,28 +54,30 @@ def aggregate_patient_data(root_dir):
                 continue
 
             for patient in os.listdir(state_folder):
-                print(patient)
+                print(f"Processing patient: {patient}")
                 patient_folder = os.path.join(state_folder, patient)
 
                 if os.path.isdir(patient_folder):
-                    patient_data = read_eeg_data(patient_folder, condition)
-                    aggregated_data.extend(patient_data)
+                    patient_data, electrode_names = read_eeg_data_flattened(patient_folder, condition, max_timestamps)
+                    aggregated_data.append(patient_data)
 
-                    # Check if this patient's data has more timestamps than previously recorded
-                    for row in patient_data:
-                        max_timestamps = max(max_timestamps, len(row) - 2)  # Exclude 'Electrode' and 'Condition'
+                    if not column_names_set:
+                        for electrode in electrode_names:
+                            column_names += [f'{electrode}_T{t}' for t in range(1, max_timestamps + 1)]
+                        column_names.append('Condition')
+                        column_names_set = True
 
-    eeg_df = pd.DataFrame(aggregated_data)
+    eeg_df = pd.DataFrame(aggregated_data, columns=column_names)
 
-    eeg_df.columns = ['Electrode'] + [f'T{i}' for i in range(1, len(eeg_df.columns) - 1)] + ['Condition']
     return eeg_df
 
 
-# Example usage
+# Set your root directory for EEG data
 root_dir = 'EEG_data'
-eeg_df = aggregate_patient_data(root_dir)
+eeg_df = aggregate_patient_data_flattened(root_dir)
+print(eeg_df)
 
+# Save to CSV
 output_file = 'RAW_eeg_data.csv'
 eeg_df.to_csv(output_file, index=False)
-
 print(f"Data exported to {output_file}")
