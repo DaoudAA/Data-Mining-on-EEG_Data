@@ -27,30 +27,19 @@ def extract_features(file_path):
     return [mean_val, std_val, skewness, kurt, mean_first_diff, mean_second_diff, rms_val]
 
 all_features = []
-
 for condition in ['AD', 'Healthy']:
     for state in ['Eyes_closed', 'Eyes_open']:
         condition_path = os.path.join(root_dir, condition, state)
-
         for patient in os.listdir(condition_path):
             patient_path = os.path.join(condition_path, patient)
-
+            patient_features = [condition, patient]  # Metadata columns
             for file_name in os.listdir(patient_path):
                 file_path = os.path.join(patient_path, file_name)
-
-                #print(f"Processing file: {file_path}")
-
                 features = extract_features(file_path)
-                if features is None:
-                    continue
-
-                electrode_name = file_name.split('.')[0]
-                all_features.append([electrode_name, condition] + features)
-
-# Define the columns for the DataFrame
-columns = ['Electrode', 'Condition', 'Mean', 'Std', 'Skew', 'Kurt', 'Mean_First_Diff', 'Mean_Second_Diff', 'RMS']
-
-# Create the DataFrame with the required structure
+                patient_features.extend(features)
+            all_features.append(patient_features)
+columns = ['Condition', 'Patient'] + [f'Electrode_{i}_Feature_{j}' for i in range(1, 22) for j in
+                                               ['Mean', 'Std', 'Skew', 'Kurt', 'Mean_First_Diff', 'Mean_Second_Diff', 'RMS']]
 df = pd.DataFrame(all_features, columns=columns)
 df.to_csv('FS_eeg_data.csv', index=False)
 
