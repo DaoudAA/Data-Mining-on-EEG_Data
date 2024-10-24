@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import skew, kurtosis
 
-root_dir = "EEG_data"
+root_dir = "../EEG_data"
 
 def extract_features(file_path):
     data = np.loadtxt(file_path)
@@ -41,6 +41,6 @@ for condition in ['AD', 'Healthy']:
 columns = ['Condition', 'Patient'] + [f'Electrode_{i}_Feature_{j}' for i in range(1, 22) for j in
                                                ['Mean', 'Std', 'Skew', 'Kurt', 'Mean_First_Diff', 'Mean_Second_Diff', 'RMS']]
 df = pd.DataFrame(all_features, columns=columns)
-df.to_csv('FS_eeg_data.csv', index=False)
+df.to_csv('../DATA/FS_eeg_data.csv', index=False)
 
 print("Feature extraction completed and saved to 'FS_eeg_data.csv'.")

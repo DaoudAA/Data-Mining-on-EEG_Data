@@ -73,11 +73,11 @@ def aggregate_patient_data_flattened(root_dir, max_timestamps=1024):
 
 
 # Set your root directory for EEG data
-root_dir = 'EEG_data'
+root_dir = '../EEG_data'
 eeg_df = aggregate_patient_data_flattened(root_dir)
 print(eeg_df)
 
 # Save to CSV
-output_file = 'RAW_eeg_data.csv'
+output_file = '../DATA/RAW_eeg_data.csv'
 eeg_df.to_csv(output_file, index=False)
 print(f"Data exported to {output_file}")

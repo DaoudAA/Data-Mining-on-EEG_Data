@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Input, Dense
 from tensorflow.keras.optimizers import Adam
 from sklearn.model_selection import train_test_split
 
-df = pd.read_csv('RAW_eeg_data.csv')
+df = pd.read_csv('../DATA/RAW_eeg_data.csv')
 
 X = df.drop(['Condition'], axis=1).values
 y = df['Condition'].values
@@ -34,7 +34,7 @@ X_train_encoded = encoder.predict(X_train)
 X_test_encoded = encoder.predict(X_test)
 
 # Save the encoded features
-np.save('X_train_encoded_basic.npy', X_train_encoded)
-np.save('X_test_encoded_basic.npy', X_test_encoded)
+np.save('../DATA/X_train_encoded_basic.npy', X_train_encoded)
+np.save('../DATA/X_test_encoded_basic.npy', X_test_encoded)
 
 print("Basic Autoencoder: Features extracted and saved.")

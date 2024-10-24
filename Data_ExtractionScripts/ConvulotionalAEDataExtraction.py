@@ -5,7 +5,7 @@ import pandas as pd
 from tensorflow.keras import layers, models
 
 # Load the EEG data into a DataFrame
-eeg_data = pd.read_csv('RAW_eeg_data.csv')
+eeg_data = pd.read_csv('../DATA/RAW_eeg_data.csv')
 
 # Separate the features (electrode data) and labels (Condition)
 eeg_features = eeg_data.drop('Condition', axis=1)  # Dropping the 'Condition' column for reshaping
@@ -71,7 +71,7 @@ encoded_eeg_data = encoder.predict(eeg_data_reshaped)
 
 # Save the encoded features (useful for later classification tasks)
 encoded_df = pd.DataFrame(encoded_eeg_data.reshape(encoded_eeg_data.shape[0], -1))
-encoded_df.to_csv('ConvolutionalAE_eeg_data.csv', index=False)
+encoded_df.to_csv('../DATA/ConvolutionalAE_eeg_data.csv', index=False)
 
 # Visualize one example of original vs reconstructed data
 decoded_eeg_data = autoencoder.predict(eeg_data_reshaped)

@@ -2,7 +2,7 @@ import pandas as pd
 import os
 
 # Define the CSV file names
-csv_files = ['FS_eeg_data.csv', 'RAW_eeg_data.csv']
+csv_files = ['ConvolutionalAE_eeg_data.csv','FFNNAE_eeg_data.csv','FS_eeg_data.csv', 'RAW_eeg_data.csv']
 
 # Initialize a dictionary to hold the file statistics
 file_stats = {}
