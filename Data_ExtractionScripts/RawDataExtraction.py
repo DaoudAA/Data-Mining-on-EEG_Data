@@ -77,7 +77,18 @@ root_dir = '../EEG_data'
 eeg_df = aggregate_patient_data_flattened(root_dir)
 print(eeg_df)
 
+# Print number of rows before removing NaN rows
+rows_before = eeg_df.shape[0]
+print(f"Number of rows before removing missing data: {rows_before}")
+
+# Remove rows with missing data
+eeg_df_clean = eeg_df.dropna()
+
+# Print number of rows after removing NaN rows
+rows_after = eeg_df_clean.shape[0]
+print(f"Number of rows after removing missing data: {rows_after}")
+
 # Save to CSV
 output_file = '../DATA/RAW_eeg_data.csv'
-eeg_df.to_csv(output_file, index=False)
+eeg_df_clean.to_csv(output_file, index=False)
 print(f"Data exported to {output_file}")

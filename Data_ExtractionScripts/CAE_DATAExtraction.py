@@ -69,7 +69,7 @@ encoded_eeg_data_array = np.concatenate(encoded_eeg_data, axis=1)  # Shape: (182
 encoded_df = pd.DataFrame(encoded_eeg_data_array)
 
 # Save the encoded data
-encoded_df.to_csv('./DATA/CAE2_eeg_data.csv', index=False)
+#encoded_df.to_csv('./DATA/ConvolutionalAE_eeg_data.csv', index=False)
 
 print("Convolutional Autoencoder applied to all electrodes, data saved.")
 
